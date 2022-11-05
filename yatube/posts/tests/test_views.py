@@ -204,7 +204,9 @@ class PostsViewTests(TestCase):
         self.assertEqual(Post.objects.count(), post_cnt - 1)
         content_after = response.content
         self.assertEqual(content_before, content_after)
-        after_clear = self.authorized_client.get(reverse(self.endpoints['index']))
+        after_clear = self.authorized_client.get(reverse(
+            self.endpoints['index']
+        ))
         self.assertNotEqual(content_before, after_clear)
 
 

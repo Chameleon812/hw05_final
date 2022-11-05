@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, Client
@@ -117,4 +116,3 @@ class PostsURLTests(TestCase):
         response = self.post_creator.get('/follow/')
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
- 
