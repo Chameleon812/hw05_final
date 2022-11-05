@@ -70,13 +70,13 @@ def post_create(request):
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     author = post.author
+    if request.user != author:
+        return redirect('posts:post_detail', post_id)
     form = PostForm(
         request.POST or None,
         files=request.FILES or None,
         instance=post
     )
-    if request.user != author:
-        return redirect('posts:post_detail', post_id)
     if request.method == 'POST' and form.is_valid():
         form.save()
         return redirect('posts:post_detail', post_id)
@@ -90,41 +90,36 @@ def post_edit(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
-    template = 'posts:post_detail'
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
-    if form.is_valid():
+    if request.method == 'POST' and form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
         comment.post = post
         comment.save()
-    return redirect(template, post_id=post_id)
+    return redirect('posts:post_detail', post_id=post_id)
 
 
 @login_required
 def follow_index(request):
-    template = 'posts/follow.html'
     post_list = Post.objects.filter(author__following__user=request.user)
     page_obj = paginate_page(request, post_list)
     context = {
         "page_obj": page_obj,
     }
-    return render(request, template, context)
+    return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    template = 'posts:profile'
     author = get_object_or_404(User, username=username)
     if request.user != author:
         Follow.objects.get_or_create(user=request.user, author=author)
-    return redirect(template, username=username)
+    return redirect('posts:profile', username=username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    template = 'posts:profile'
     author = get_object_or_404(User, username=username)
-    if request.user != author:
-        Follow.objects.filter(user=request.user, author=author).delete()
-    return redirect(template, username=username)
+    Follow.objects.filter(user=request.user, author=author).delete()
+    return redirect('posts:profile', username=username)

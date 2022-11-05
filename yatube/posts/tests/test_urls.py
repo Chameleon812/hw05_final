@@ -35,7 +35,6 @@ class PostsURLTests(TestCase):
             'create_post': '/create/',
             'index': '/'
         }
-        cache.clear()
 
     def setUp(self):
         self.guest_client = Client()
@@ -48,14 +47,12 @@ class PostsURLTests(TestCase):
 
     def test_pages_for_all(self):
         """Проверка страниц доступных всем."""
-        cache.clear()
         pages_for_all = {
             self.endpoints['index']: 'posts/index.html',
             self.endpoints['group_list']: 'posts/group_list.html',
             self.endpoints['profile']: 'posts/profile.html',
             self.endpoints['post_detail']: 'posts/post_detail.html'
         }
-        cache.clear()
 
         for page, template in pages_for_all.items():
             with self.subTest(page=page):
@@ -68,14 +65,12 @@ class PostsURLTests(TestCase):
         response = self.post_creator.get(self.endpoints['edit_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        cache.clear()
 
     def test_pages_for_uncreator(self):
         """Проверка доступа авторизованного пользователя к созданию поста"""
         response = self.authorized_client.get(self.endpoints['create_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        cache.clear()
 
     def test_guest_for_edit_post(self):
         """Проверка на доступ гостя к странице редактирования поста."""
@@ -86,7 +81,6 @@ class PostsURLTests(TestCase):
             response,
             f'/auth/login/?next=/posts/{self.post.id}/edit/'
         )
-        cache.clear()
 
     def test_uncreator_post_edit(self):
         """Проверка на доступ не автора к странице редактирования поста."""
@@ -94,14 +88,12 @@ class PostsURLTests(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, self.endpoints['post_detail'])
-        cache.clear()
 
     def test_page_not_exist(self):
         """Страницы, которых не предусмотрено."""
         response = self.guest_client.get('/owls/')
 
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        cache.clear()
 
     def test_templates_for_urls(self):
         """Корректность шаблонов."""
@@ -119,11 +111,10 @@ class PostsURLTests(TestCase):
                 response = self.post_creator.get(url)
 
                 self.assertTemplateUsed(response, template)
-        cache.clear()
 
     def test_follow_index_page(self):
         """Страница подписок доступна автору."""
-        response = self.post_creator.get(reverse("posts:follow_index"))
+        response = self.post_creator.get('/follow/')
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        cache.clear()
+ 

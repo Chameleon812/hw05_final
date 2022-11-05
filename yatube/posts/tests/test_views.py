@@ -15,14 +15,6 @@ from posts.models import Group, Post, Comment, Follow
 
 User = get_user_model()
 
-test_img = (
-    b"\x47\x49\x46\x38\x39\x61\x02\x00"
-    b"\x01\x00\x80\x00\x00\x00\x00\x00"
-    b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
-    b"\x00\x00\x00\x2C\x00\x00\x00\x00"
-    b"\x02\x00\x01\x00\x00\x02\x02\x0C"
-    b"\x0A\x00\x3B"
-)
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
@@ -39,7 +31,7 @@ class PostsViewTests(TestCase):
         )
         tst_img = SimpleUploadedFile(
             name='test_img.gif',
-            content=test_img,
+            content=Post.test_img,
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
@@ -68,7 +60,6 @@ class PostsViewTests(TestCase):
             'post_detail': 'posts:post_detail',
             'post_create': 'posts:post_create',
             'post_edit': 'posts:post_edit'}
-        cache.clear()
 
     def setUp(self):
         self.post_creator = Client()
@@ -83,17 +74,14 @@ class PostsViewTests(TestCase):
         self.assertEqual(self.post.group, post.group)
         self.assertEqual(self.post.pub_date, post.pub_date)
         self.assertEqual(self.post.image, post.image)
-        cache.clear()
 
     def checking_correct_group(self, group):
         self.assertEqual(self.group.title, group.title)
         self.assertEqual(self.group.slug, group.slug)
         self.assertEqual(self.group.description, group.description)
-        cache.clear()
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        cache.clear()
         templates_pages_names = {
             reverse(
                 self.endpoints['index']
@@ -125,11 +113,9 @@ class PostsViewTests(TestCase):
 
     def test_index_show_correct_context(self):
         """Проверка контекста главной страницы."""
-        cache.clear()
         response = self.authorized_client.get(reverse(self.endpoints['index']))
 
         self.checking_correct_post(response.context['page_obj'][0])
-        cache.clear()
 
     def test_grouplist_show_correct_context(self):
         """Проверка контекста страницы группы."""
@@ -139,13 +125,13 @@ class PostsViewTests(TestCase):
 
         self.checking_correct_group(response.context.get('group'))
         self.checking_correct_post(response.context['page_obj'][0])
-        cache.clear()
 
     def test_profile_show_correct_context(self):
         """Проверка контекста профиля автора."""
         response = self.authorized_client.get(reverse(
             self.endpoints['profile'], kwargs={'username': self.post.author}
         ))
+
         page_cntx = response.context['page_obj'][0]
         cnt_cntx = response.context.get('count_posts')
         author_cntx = response.context.get('author')
@@ -153,7 +139,6 @@ class PostsViewTests(TestCase):
         self.checking_correct_post(page_cntx)
         self.assertEqual(cnt_cntx, self.cnt_posts)
         self.assertEqual(author_cntx, self.post.author)
-        cache.clear()
 
     def test_postdetail_show_correct_context(self):
         """Проверка контекста страницы поста."""
@@ -165,7 +150,6 @@ class PostsViewTests(TestCase):
 
         self.checking_correct_post(text_cntx)
         self.assertEqual(cnt_cntx, self.cnt_posts)
-        cache.clear()
 
     def test_editpost_show_correct_context(self):
         """Проверка контекста страницы редактирования поста."""
@@ -179,7 +163,6 @@ class PostsViewTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context['form'].fields[value]
                 self.assertIsInstance(form_field, expected)
-        cache.clear()
 
     def test_addpost_show_correct_context(self):
         """Проверка контекста страницы создания поста."""
@@ -191,7 +174,6 @@ class PostsViewTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context['form'].fields[value]
                 self.assertIsInstance(form_field, expected)
-        cache.clear()
 
     def test_correctly_added_post(self):
         """Проверка на корректное добавление поста."""
@@ -212,21 +194,18 @@ class PostsViewTests(TestCase):
         self.assertIn(self.post, index, 'На главную пост не добавился')
         self.assertIn(self.post, group, 'В группу пост не добавился')
         self.assertIn(self.post, profile, 'В профиль пост не добавился')
-        cache.clear()
 
     def test_cache_index(self):
         """Проверка кэширования главной страницы"""
         post_cnt = Post.objects.count()
-        response = self.authorized_client.get('/')
+        response = self.authorized_client.get(reverse(self.endpoints['index']))
         content_before = response.content
         Post.objects.get().delete()
         self.assertEqual(Post.objects.count(), post_cnt - 1)
         content_after = response.content
         self.assertEqual(content_before, content_after)
-        cache.clear()
-        after_clear = self.authorized_client.get('/')
+        after_clear = self.authorized_client.get(reverse(self.endpoints['index']))
         self.assertNotEqual(content_before, after_clear)
-        cache.clear()
 
 
 class PaginatorViewsTest(TestCase):
@@ -255,7 +234,6 @@ class PaginatorViewsTest(TestCase):
         self.not_authorized = Client()
         self.authorized = Client()
         self.authorized.force_login(self.user_auth)
-        cache.clear()
 
     def test_correct_page_context_guest_client(self):
         """Проверка количества постов на первой и второй страницах."""
@@ -280,7 +258,6 @@ class PaginatorViewsTest(TestCase):
                 page2_cnt,
                 self.COUNT_TEST_POSTS - settings.POSTS_PER_PAGE
             )
-        cache.clear()
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -303,8 +280,8 @@ class FollowViewsTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         self.authorized_follower = Client()
