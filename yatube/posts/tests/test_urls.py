@@ -60,7 +60,6 @@ class PostsURLTests(TestCase):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
-
     def setUp(self):
         self.guest_client = Client()
         self.user = User.objects.create_user(username='guest')
@@ -68,8 +67,8 @@ class PostsURLTests(TestCase):
         self.authorized_client.force_login(self.user_uncreator)
         self.post_creator = Client()
         self.post_creator.force_login(self.user_creator)
-        cache.clear()
         settings.MEDIA_ROOT = tempfile.mkdtemp()
+        cache.clear()
 
     def test_pages_for_all(self):
         """Проверка страниц доступных всем."""

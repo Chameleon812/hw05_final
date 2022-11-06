@@ -62,7 +62,6 @@ class Post(models.Model):
         blank=True
     )
 
-
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'пост'

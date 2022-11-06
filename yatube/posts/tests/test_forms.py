@@ -49,7 +49,6 @@ class PostFormCreateTests(TestCase):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
-
     def setUp(self):
         self.guest_client = Client()
         self.creator_client = Client()
