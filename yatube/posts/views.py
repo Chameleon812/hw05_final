@@ -44,7 +44,7 @@ def post_detail(request, post_id):
     post_author = post.author
     post_count = post_author.posts.select_related('author').count()
     form = CommentForm(request.POST or None)
-    comments = post.comments.select_related("author")
+    comments = post.comments.select_related('author')
     context = {
         'post': post,
         'post_count': post_count,
@@ -105,7 +105,7 @@ def follow_index(request):
     post_list = Post.objects.filter(author__following__user=request.user)
     page_obj = paginate_page(request, post_list)
     context = {
-        "page_obj": page_obj,
+        'page_obj': page_obj,
     }
     return render(request, 'posts/follow.html', context)
 

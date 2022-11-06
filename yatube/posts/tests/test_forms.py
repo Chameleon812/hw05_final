@@ -35,22 +35,32 @@ class PostFormCreateTests(TestCase):
             group=cls.group,
         )
         cls.form = PostForm()
+        cls.test_img = (
+            b"\x47\x49\x46\x38\x39\x61\x02\x00"
+            b"\x01\x00\x80\x00\x00\x00\x00\x00"
+            b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
+            b"\x00\x00\x00\x2C\x00\x00\x00\x00"
+            b"\x02\x00\x01\x00\x00\x02\x02\x0C"
+            b"\x0A\x00\x3B"
+        )
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
 
     def setUp(self):
         self.guest_client = Client()
         self.creator_client = Client()
         self.creator_client.force_login(self.creator)
         cache.clear()
+        settings.MEDIA_ROOT = tempfile.mkdtemp()
 
     def test_creator_create_new_post(self):
         """Создание нового поста авторизованным пользователем."""
         post_count = Post.objects.count()
-        ima1_gif = Post.test_img
+        ima1_gif = self.test_img
         uploaded = SimpleUploadedFile(
             name='test1.gif',
             content=ima1_gif,
@@ -85,7 +95,7 @@ class PostFormCreateTests(TestCase):
     def test_guest_create_new_post(self):
         """Тест на возможность создания поста неавторизованным юзером."""
         post_count = Post.objects.count()
-        ima2_gif = Post.test_img
+        ima2_gif = self.test_img
         uploaded = SimpleUploadedFile(
             name='test2.gif',
             content=ima2_gif,
@@ -111,7 +121,7 @@ class PostFormCreateTests(TestCase):
     def test_creator_edit_post(self):
         """Редактирование поста авторизованным пользователем."""
         post_count = Post.objects.count()
-        ima3_gif = Post.test_img
+        ima3_gif = self.test_img
         uploaded = SimpleUploadedFile(
             name='test3.gif',
             content=ima3_gif,
@@ -144,7 +154,7 @@ class PostFormCreateTests(TestCase):
     def test_guest_edit_post(self):
         """Тест на возможность редактирования поста неавторизованным юзером."""
         post_count = Post.objects.count()
-        ima4_gif = Post.test_img
+        ima4_gif = self.test_img
         uploaded = SimpleUploadedFile(
             name='test4.gif',
             content=ima4_gif,
@@ -174,6 +184,7 @@ class PostFormTests(TestCase):
         super().setUpClass()
         cls.form = PostForm()
         cache.clear()
+        settings.MEDIA_ROOT = tempfile.mkdtemp()
 
     def test_text_label(self):
         text_label = PostFormTests.form.fields['text'].label

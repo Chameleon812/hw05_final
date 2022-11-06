@@ -29,9 +29,17 @@ class PostsViewTests(TestCase):
             slug='test_slug',
             description='Текст описания тестовой группы'
         )
+        test_img = (
+            b"\x47\x49\x46\x38\x39\x61\x02\x00"
+            b"\x01\x00\x80\x00\x00\x00\x00\x00"
+            b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
+            b"\x00\x00\x00\x2C\x00\x00\x00\x00"
+            b"\x02\x00\x01\x00\x00\x02\x02\x0C"
+            b"\x0A\x00\x3B"
+        )
         tst_img = SimpleUploadedFile(
             name='test_img.gif',
-            content=Post.test_img,
+            content=test_img,
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
@@ -61,12 +69,18 @@ class PostsViewTests(TestCase):
             'post_create': 'posts:post_create',
             'post_edit': 'posts:post_edit'}
 
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
     def setUp(self):
         self.post_creator = Client()
         self.post_creator.force_login(self.user_creator)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user_uncreator)
         cache.clear()
+        settings.MEDIA_ROOT = tempfile.mkdtemp()
 
     def checking_correct_post(self, post):
         self.assertEqual(self.post.author, post.author)

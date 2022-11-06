@@ -30,7 +30,6 @@ class PostModelTest(TestCase):
             'author': 'автор',
             'group': 'группа',
         }
-
         post = PostModelTest.post
 
         for field, expected_value in field_verboses.items():
@@ -45,7 +44,6 @@ class PostModelTest(TestCase):
             'text': 'Напишите текст поста',
             'group': 'Группа, к которой будет относиться пост',
         }
-
         post = PostModelTest.post
 
         for field, expected_value in field_help_texts.items():
