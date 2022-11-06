@@ -5,7 +5,7 @@ from http import HTTPStatus
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from posts.models import Post, Group
@@ -15,7 +15,7 @@ User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
-
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsURLTests(TestCase):
     @classmethod
     def setUpClass(cls):

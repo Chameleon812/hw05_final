@@ -17,7 +17,7 @@ User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
-
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -80,7 +80,6 @@ class PostsViewTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user_uncreator)
         cache.clear()
-        settings.MEDIA_ROOT = tempfile.mkdtemp()
 
     def checking_correct_post(self, post):
         self.assertEqual(self.post.author, post.author)
