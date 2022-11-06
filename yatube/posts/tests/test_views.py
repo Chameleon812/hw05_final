@@ -72,8 +72,8 @@ class PostsViewTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         self.post_creator = Client()
@@ -210,7 +210,7 @@ class PostsViewTests(TestCase):
         self.assertIn(self.post, profile, 'В профиль пост не добавился')
 
     def test_cache_index(self):
-        """Проверка кэширования главной страницы"""
+        """Проверка кэширования главной страницы."""
         post_cnt = Post.objects.count()
         response = self.authorized_client.get(reverse(self.endpoints['index']))
         content_before = response.content
@@ -256,11 +256,11 @@ class PaginatorViewsTest(TestCase):
         pages: tuple = (reverse('posts:index'),
                         reverse('posts:profile',
                                 kwargs={
-                                    'username': f'{self.user_auth.username}'
+                                    'username': self.user_auth.username
                                 }),
                         reverse('posts:group_list',
                                 kwargs={
-                                    'slug': f'{self.group.slug}'
+                                    'slug': self.group.slug
                                 }))
 
         for page in pages:
@@ -308,15 +308,18 @@ class FollowViewsTest(TestCase):
     def test_authorized_user_can_follow(self):
         """Авторизованный пользователь может подписываться."""
         follow_count = Follow.objects.count()
+
         response_follow = self.authorized_follower.get(reverse(
             'posts:profile_follow',
             kwargs={'username': self.following}
         ))
+
         self.assertRedirects(
             response_follow,
-            reverse('posts:profile',
-                    kwargs={'username': self.following}
-                    )
+            reverse(
+                'posts:profile',
+                kwargs={'username': self.following}
+            )
         )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
         self.assertTrue(
@@ -330,10 +333,12 @@ class FollowViewsTest(TestCase):
         """Авторизованный пользователь может отписываться."""
         Follow.objects.create(user=self.follower, author=self.following)
         follow_count = Follow.objects.count()
+
         response_unfollow = self.authorized_follower.get(reverse(
             'posts:profile_unfollow',
             kwargs={'username': self.following}
         ))
+
         self.assertRedirects(
             response_unfollow,
             reverse('posts:profile',
@@ -351,15 +356,18 @@ class FollowViewsTest(TestCase):
     def test_follower_get_follow_index(self):
         """Новая запись пользователя появляется в ленте у подписчика."""
         Follow.objects.create(user=self.follower, author=self.following)
+
         response_follower = self.authorized_follower.get(
             reverse('posts:follow_index'))
         first_post = response_follower.context['page_obj'][0]
+
         self.assertEqual(first_post.text, self.following_post.text)
         self.assertEqual(first_post.author, self.following)
 
     def test_unfollower_dont_get_follow_index(self):
-        """Новая запись пользователя не появляется в ленте у не подписчиков"""
+        """Новая запись пользователя не появляется в ленте у не подписчиков."""
         response_following = self.authorized_following.get(reverse(
             'posts:follow_index'))
+
         self.assertEqual(
             response_following.context['page_obj'].paginator.count, 0)
