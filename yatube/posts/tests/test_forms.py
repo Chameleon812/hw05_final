@@ -176,6 +176,7 @@ class PostFormCreateTests(TestCase):
             '/auth/login/?next=%2Fposts%2F1%2Fedit%2F')
         self.assertEqual(Post.objects.count(), post_count)
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostFormTests(TestCase):
     @classmethod
