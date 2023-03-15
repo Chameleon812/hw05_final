@@ -25,12 +25,12 @@ class PostFormCreateTests(TestCase):
         super().setUpClass()
         cls.creator = User.objects.create(username="creator")
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Текст описания тестовой группы',
+            description='Test group description text',
         )
         cls.post = Post.objects.create(
-            text='Текст тестового поста',
+            text='Test post text',
             author=cls.creator,
             group=cls.group,
         )
@@ -57,7 +57,7 @@ class PostFormCreateTests(TestCase):
         settings.MEDIA_ROOT = tempfile.mkdtemp()
 
     def test_creator_create_new_post(self):
-        """Создание нового поста авторизованным пользователем."""
+        """Creation of a new post by an authorized user."""
         post_count = Post.objects.count()
         ima1_gif = self.test_img
         uploaded = SimpleUploadedFile(
@@ -66,7 +66,7 @@ class PostFormCreateTests(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Текст для заполнения формы',
+            'text': 'Text to fill out the form',
             'group': self.group.id,
             'image': uploaded,
         }
@@ -92,7 +92,7 @@ class PostFormCreateTests(TestCase):
         )
 
     def test_guest_create_new_post(self):
-        """Тест на возможность создания поста неавторизованным юзером."""
+        """Test for the possibility of creating a post by an unauthorized user."""
         post_count = Post.objects.count()
         ima2_gif = self.test_img
         uploaded = SimpleUploadedFile(
@@ -101,7 +101,7 @@ class PostFormCreateTests(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Текст для заполнения формы',
+            'text': 'Text to fill out the form',
             'group': self.group.id,
             'image': uploaded,
         }
@@ -118,7 +118,7 @@ class PostFormCreateTests(TestCase):
         self.assertEqual(Post.objects.count(), post_count)
 
     def test_creator_edit_post(self):
-        """Редактирование поста авторизованным пользователем."""
+        """Editing a post by an authorized user."""
         post_count = Post.objects.count()
         ima3_gif = self.test_img
         uploaded = SimpleUploadedFile(
@@ -127,7 +127,7 @@ class PostFormCreateTests(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Текст для заполнения формы',
+            'text': 'Text to fill out the form',
             'group': self.group.id,
             'image': uploaded,
         }
@@ -151,7 +151,7 @@ class PostFormCreateTests(TestCase):
         )
 
     def test_guest_edit_post(self):
-        """Тест на возможность редактирования поста неавторизованным юзером."""
+        """Test for the possibility of editing a post by an unauthorized user."""
         post_count = Post.objects.count()
         ima4_gif = self.test_img
         uploaded = SimpleUploadedFile(
@@ -160,7 +160,7 @@ class PostFormCreateTests(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Текст для заполнения формы',
+            'text': 'Text to fill out the form',
             'group': self.group.id,
             'image': uploaded,
         }
@@ -188,17 +188,17 @@ class PostFormTests(TestCase):
     def test_text_label(self):
         text_label = PostFormTests.form.fields['text'].label
 
-        self.assertEqual(text_label, 'Текст записи')
+        self.assertEqual(text_label, 'Entry text')
 
     def test_group_label(self):
         group_label = PostFormTests.form.fields['group'].label
 
-        self.assertEqual(group_label, 'Сообщество')
+        self.assertEqual(group_label, 'Group')
 
     def test_image_label(self):
         image_label = PostFormTests.form.fields['image'].label
 
-        self.assertEqual(image_label, 'Картинка')
+        self.assertEqual(image_label, 'Picture')
 
 
 class CommentFormTests(TestCase):
@@ -207,7 +207,7 @@ class CommentFormTests(TestCase):
         super().setUpClass()
         cls.user = User.objects.create(username='commentator')
         cls.post = Post.objects.create(
-            text='Текст тестового поста',
+            text='Test post text',
             author=cls.user
         )
         cls.form = CommentForm()
@@ -219,10 +219,10 @@ class CommentFormTests(TestCase):
         cache.clear()
 
     def test_user_create_comment(self):
-        """User создает коммент к посту."""
+        """User creates a comment on a post."""
         comment_cnt = Comment.objects.count()
         form_data = {
-            'text': 'Текст комментатора',
+            'text': 'Commentator text',
             'author': self.user,
             'post': self.post.id
         }
@@ -241,16 +241,16 @@ class CommentFormTests(TestCase):
         ))
         self.assertEqual(Comment.objects.count(), comment_cnt + 1)
         self.assertTrue(Comment.objects.filter(
-            text='Текст комментатора',
+            text='Commentator text',
             author=self.user,
             post=self.post.id
         ))
 
     def test_guest_create_comment(self):
-        """Guest создает коммент к посту."""
+        """Guest creates a comment on a post."""
         comment_cnt = Comment.objects.count()
         form_data = {
-            'text': 'Текст комментатора',
+            'text': 'Commentator text',
         }
 
         response = self.guest_client.post(

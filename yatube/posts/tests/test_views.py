@@ -26,9 +26,9 @@ class PostsViewTests(TestCase):
         cls.user_creator = User.objects.create(username='user_cr')
         cls.user_uncreator = User.objects.create(username='user_un')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Текст описания тестовой группы'
+            description='Test group description text'
         )
         test_img = (
             b"\x47\x49\x46\x38\x39\x61\x02\x00"
@@ -44,7 +44,7 @@ class PostsViewTests(TestCase):
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
-            text='Текст тестового поста',
+            text='Test post text',
             author=cls.user_creator,
             group=cls.group,
             pub_date=date.today(),
@@ -58,7 +58,7 @@ class PostsViewTests(TestCase):
         cls.comment = Comment.objects.create(
             post=cls.post,
             author=cls.user_creator,
-            text="Текст тестового комментария к посту",
+            text="The text of the test comment to the post",
         )
         cls.posts = cls.post.author.posts.select_related('author')
         cls.cnt_posts = cls.post.author.posts.count()
@@ -95,7 +95,7 @@ class PostsViewTests(TestCase):
         self.assertEqual(self.group.description, group.description)
 
     def test_pages_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
+        """The URL uses the appropriate pattern."""
         templates_pages_names = {
             reverse(
                 self.endpoints['index']
@@ -126,13 +126,13 @@ class PostsViewTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_index_show_correct_context(self):
-        """Проверка контекста главной страницы."""
+        """Checking the context of the main page."""
         response = self.authorized_client.get(reverse(self.endpoints['index']))
 
         self.checking_correct_post(response.context['page_obj'][0])
 
     def test_grouplist_show_correct_context(self):
-        """Проверка контекста страницы группы."""
+        """Checking the context of the group page."""
         response = self.authorized_client.get(reverse(
             self.endpoints['group_list'], kwargs={'slug': self.group.slug}
         ))
@@ -141,7 +141,7 @@ class PostsViewTests(TestCase):
         self.checking_correct_post(response.context['page_obj'][0])
 
     def test_profile_show_correct_context(self):
-        """Проверка контекста профиля автора."""
+        """Checking the context of the author profile."""
         response = self.authorized_client.get(reverse(
             self.endpoints['profile'], kwargs={'username': self.post.author}
         ))
@@ -155,7 +155,7 @@ class PostsViewTests(TestCase):
         self.assertEqual(author_cntx, self.post.author)
 
     def test_postdetail_show_correct_context(self):
-        """Проверка контекста страницы поста."""
+        """Checking the context of the post page."""
         response = self.authorized_client.get(reverse(
             self.endpoints['post_detail'], kwargs={'post_id': self.post.pk}
         ))
@@ -166,7 +166,7 @@ class PostsViewTests(TestCase):
         self.assertEqual(cnt_cntx, self.cnt_posts)
 
     def test_editpost_show_correct_context(self):
-        """Проверка контекста страницы редактирования поста."""
+        """Checking the context of the post edit page."""
         response = self.post_creator.get(reverse(
             self.endpoints['post_edit'], kwargs={'post_id': self.post.pk}
         ))
@@ -179,7 +179,7 @@ class PostsViewTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_addpost_show_correct_context(self):
-        """Проверка контекста страницы создания поста."""
+        """Checking the context of the post creation page."""
         response = self.authorized_client.get(reverse(
             self.endpoints['post_create']
         ))
@@ -190,7 +190,7 @@ class PostsViewTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_correctly_added_post(self):
-        """Проверка на корректное добавление поста."""
+        """Checking for the correct addition of the post."""
         response_index = self.authorized_client.get(reverse(
             self.endpoints['index']
         ))
@@ -205,12 +205,12 @@ class PostsViewTests(TestCase):
         group = response_group.context['page_obj']
         profile = response_profile.context['page_obj']
 
-        self.assertIn(self.post, index, 'На главную пост не добавился')
-        self.assertIn(self.post, group, 'В группу пост не добавился')
-        self.assertIn(self.post, profile, 'В профиль пост не добавился')
+        self.assertIn(self.post, index, 'Not added to main post')
+        self.assertIn(self.post, group, 'The post was not added to the group')
+        self.assertIn(self.post, profile, 'Post not added to profile')
 
     def test_cache_index(self):
-        """Проверка кэширования главной страницы."""
+        """Checking the caching of the main page."""
         post_cnt = Post.objects.count()
         response = self.authorized_client.get(reverse(self.endpoints['index']))
         content_before = response.content
@@ -232,14 +232,14 @@ class PaginatorViewsTest(TestCase):
         super().setUpClass()
         cls.user_auth = User.objects.create(username='auth')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Текст описания тестовой группы'
+            description='Test group description text'
         )
         cls.some_posts = [
             Post(
                 author=cls.user_auth,
-                text=f'Тестовый пост{post_num}',
+                text=f'Test post {post_num}',
                 group=cls.group
             )
             for post_num in range(cls.COUNT_TEST_POSTS)
@@ -252,7 +252,7 @@ class PaginatorViewsTest(TestCase):
         self.authorized.force_login(self.user_auth)
 
     def test_correct_page_context_guest_client(self):
-        """Проверка количества постов на первой и второй страницах."""
+        """Checking the number of posts on the first and second pages."""
         pages: tuple = (reverse('posts:index'),
                         reverse('posts:profile',
                                 kwargs={
@@ -286,11 +286,11 @@ class FollowViewsTest(TestCase):
         cls.following = User.objects.create(
             username='following_man')
         cls.follower_post = Post.objects.create(
-            text='Текст тестового поста follower',
+            text='Follower test post text',
             author=cls.follower,
         )
         cls.following_post = Post.objects.create(
-            text='Текст тестового поста following',
+            text='The text of the test post is as follows',
             author=cls.following,
         )
 
@@ -306,7 +306,7 @@ class FollowViewsTest(TestCase):
         self.authorized_following.force_login(self.following)
 
     def test_authorized_user_can_follow(self):
-        """Авторизованный пользователь может подписываться."""
+        """An authorized user can subscribe."""
         follow_count = Follow.objects.count()
 
         response_follow = self.authorized_follower.get(reverse(
@@ -330,7 +330,7 @@ class FollowViewsTest(TestCase):
         )
 
     def test_authorized_user_can_unfollow(self):
-        """Авторизованный пользователь может отписываться."""
+        """An authorized user can unsubscribe."""
         Follow.objects.create(user=self.follower, author=self.following)
         follow_count = Follow.objects.count()
 
@@ -354,7 +354,7 @@ class FollowViewsTest(TestCase):
         )
 
     def test_follower_get_follow_index(self):
-        """Новая запись пользователя появляется в ленте у подписчика."""
+        """The new user post appears in the subscriber's feed."""
         Follow.objects.create(user=self.follower, author=self.following)
 
         response_follower = self.authorized_follower.get(
@@ -365,7 +365,7 @@ class FollowViewsTest(TestCase):
         self.assertEqual(first_post.author, self.following)
 
     def test_unfollower_dont_get_follow_index(self):
-        """Новая запись пользователя не появляется в ленте у не подписчиков."""
+        """A new user post does not appear in the feed of non-followers."""
         response_following = self.authorized_following.get(reverse(
             'posts:follow_index'))
 

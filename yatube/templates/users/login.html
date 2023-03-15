@@ -6,7 +6,7 @@
     <div class="col-md-8 p-5">
       <div class="card">
         <div class="card-header">
-          Войти на сайт
+          Log in to the site
         </div>
         <div class="card-body">
           {% if form.errors %}
@@ -57,10 +57,10 @@
           {% endfor %}
           <div class="col-md-6 offset-md-4">
             <button type="submit" class="btn btn-primary">
-              Войти
+              Log in
             </button>
             <a href="{% url 'users:password_reset' %}" class="btn btn-link">
-              Забыли пароль?
+              Forgot password?
             </a>
           </div>
           </form>

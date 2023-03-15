@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Зарегистрироваться{% endblock %}
+{% block title %}Register{% endblock %}
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-8 p-5">
       <div class="card">
-        <div class="card-header">Зарегистрироваться</div>
+        <div class="card-header">Register</div>
           <div class="card-body">
           {% load user_filters %}
             {% if form.errors %}
@@ -44,7 +44,7 @@
               {% endfor %}
               <div class="col-md-6 offset-md-4">
                 <button type="submit" class="btn btn-primary">
-                  Зарегистрироваться
+                  Register
                 </button>
               </div>
             </form>

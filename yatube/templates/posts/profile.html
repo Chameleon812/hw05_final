@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-  Профайл пользователя {{ author }}
+  User profile {{ author }}
 {% endblock %}
-{% block header %}Все записи пользователя: {{ author.get_full_name }}{% endblock %}
+{% block header %}All user records: {{ author.get_full_name }}{% endblock %}
 {% block content %}
-  <h4>Всего постов: {{ count_posts }} </h4>
-  Подписчиков: {{ author.following.count }} <br/>
-  Подписан: {{ author.follower.count }} <br/>
+  <h4>Total posts: {{ count_posts }} </h4>
+  Followers: {{ author.following.count }} <br/>
+  Subscribed to: {{ author.follower.count }} <br/>
   {% if request.user.is_authenticated and user != author %}
     {% if following %}
       <a
@@ -15,7 +15,7 @@
        href="{% url 'posts:profile_unfollow' author.username %}"
        role="button"
       >
-        Отписаться
+        Unsubscribe
       </a>
     {% else %}
       <a
@@ -23,7 +23,7 @@
        href="{% url 'posts:profile_follow' author.username %}"
        role="button"
       >
-        Подписаться
+        Subscribe
       </a>
     {% endif %}
   {% endif %}

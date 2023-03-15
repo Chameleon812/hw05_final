@@ -24,9 +24,9 @@ class PostsURLTests(TestCase):
         cls.user_creator = User.objects.create(username='user_cr')
         cls.user_uncreator = User.objects.create(username='user_un')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Текст описания тестовой группы'
+            description='Test group description text'
         )
         test_img = (
             b"\x47\x49\x46\x38\x39\x61\x02\x00"
@@ -41,7 +41,7 @@ class PostsURLTests(TestCase):
             content=test_img,
             content_type='image/gif')
         cls.post = Post.objects.create(
-            text='Текст тестового поста',
+            text='Test post text',
             author=cls.user_creator,
             group=cls.group,
             image=tst_img
@@ -72,7 +72,7 @@ class PostsURLTests(TestCase):
         cache.clear()
 
     def test_pages_for_all(self):
-        """Проверка страниц доступных всем."""
+        """Checking the pages available to everyone."""
         pages_for_all = {
             self.endpoints['index']: 'posts/index.html',
             self.endpoints['group_list']: 'posts/group_list.html',
@@ -87,19 +87,19 @@ class PostsURLTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_pages_for_author(self):
-        """Проверка страниц для автора."""
+        """Check pages for author."""
         response = self.post_creator.get(self.endpoints['edit_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_pages_for_uncreator(self):
-        """Проверка доступа авторизованного пользователя к созданию поста"""
+        """Checking the access of an authorized user to create a post."""
         response = self.authorized_client.get(self.endpoints['create_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_guest_for_edit_post(self):
-        """Проверка на доступ гостя к странице редактирования поста."""
+        """Checking for guest access to the post editing page."""
         response = self.guest_client.get(self.endpoints['edit_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
@@ -109,20 +109,20 @@ class PostsURLTests(TestCase):
         )
 
     def test_uncreator_post_edit(self):
-        """Проверка на доступ не автора к странице редактирования поста."""
+        """Checking for non-author access to the post edit page."""
         response = self.authorized_client.get(self.endpoints['edit_post'])
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, self.endpoints['post_detail'])
 
     def test_page_not_exist(self):
-        """Страницы, которых не предусмотрено."""
+        """Pages not provided."""
         response = self.guest_client.get('/owls/')
 
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_templates_for_urls(self):
-        """Корректность шаблонов."""
+        """Template correctness."""
         templates_urls = {
             self.endpoints['index']: 'posts/index.html',
             self.endpoints['group_list']: 'posts/group_list.html',
@@ -140,7 +140,7 @@ class PostsURLTests(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_follow_index_page(self):
-        """Страница подписок доступна автору."""
+        """The subscription page is available to the author."""
         response = self.post_creator.get('/follow/')
 
         self.assertEqual(response.status_code, HTTPStatus.OK)

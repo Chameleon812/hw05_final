@@ -3,30 +3,30 @@
   Пост {{ post_title }}
 {% endblock %}
 {% block content %}
-  <h4> Информация о публикации: {{ post_title }} </h4>
+  <h4> Information about the publication: {{ post_title }} </h4>
   <div class="row">
     <aside class="col-12 col-md-3">
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-          Дата публикации: {{ pub_date|date:"d E Y" }}
+          Date of publication: {{ pub_date|date:"d E Y" }}
         </li>
         {% if post.group %}
           <li class="list-group-item">
-            Группа: {{ post.group.title }}
+            Group: {{ post.group.title }}
             <a href="{% url 'posts:group_list' post.group.slug %}">
-              Все записи сообщества
+              All community records
             </a>
           </li>
         {% endif %}
         <li class="list-group-item">
-          Автор: {{ post.author.get_full_name }} (username: {{ author }})
+          Author: {{ post.author.get_full_name }} (username: {{ author }})
         </li>
         <li class="list-group-item">
-          Всего постов автора: <span>{{ author_cnt_posts }}</span>
+          Total posts by the author: <span>{{ author_cnt_posts }}</span>
          </li>
         <li class="list-group-item">
           <a href="{% url 'posts:profile' post.author %}">
-            Все записи автора
+            All the author's entries
           </a>
         </li>
       </ul>
@@ -41,7 +41,7 @@
       </p>
       {% if post.author.username == user.username %}
         <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}" >
-          Редактировать запись
+          Edit
         </a>
       {% endif %}
       {% include "includes/comments.html"%}

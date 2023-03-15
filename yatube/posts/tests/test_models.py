@@ -13,22 +13,22 @@ class PostModelTest(TestCase):
         cls.user = User.objects.create_user(username='auth')
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост для проверки',
+            text='Test post to check',
         )
 
     def test_post_model_object_name(self):
-        """Проверяем, что у модели Post корректно работает __str__."""
+        """We check that __str__ works correctly for the Post model."""
         post = PostModelTest.post
         object_name = str(post)
 
         self.assertEqual(object_name, post.text[:15])
 
     def test_post_model_verbose_name(self):
-        """Проверяем наличиет verbose_name."""
+        """Check for verbose_name."""
         field_verboses = {
-            'text': 'Текст записи',
-            'author': 'автор',
-            'group': 'группа',
+            'text': 'entry text',
+            'author': 'author',
+            'group': 'group',
         }
         post = PostModelTest.post
 
@@ -39,10 +39,10 @@ class PostModelTest(TestCase):
                 )
 
     def test_post_model_help_text(self):
-        """Проверяем help_text."""
+        """Checking help_text."""
         field_help_texts = {
-            'text': 'Напишите текст поста',
-            'group': 'Группа, к которой будет относиться пост',
+            'text': 'Write the text of the post',
+            'group': 'The group to which the post belongs',
         }
         post = PostModelTest.post
 
@@ -58,13 +58,13 @@ class GroupModelTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='Тестовый слаг',
-            description='Тестовое описание',
+            title='Test group',
+            slug='Test slug',
+            description='Test description',
         )
 
     def test_group_model_object_name(self):
-        """Проверяем, что у модели Group корректно работает __str__."""
+        """We check that __str__ works correctly for the Group model."""
         group = GroupModelTest.group
         object_name = group.title
 
