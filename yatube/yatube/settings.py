@@ -21,6 +21,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '[::1]',
     'testserver',
+    '62.84.114.177'
 ]
 
 INSTALLED_APPS = [
@@ -117,3 +118,5 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
